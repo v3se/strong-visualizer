@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 
 app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.DARKLY])
+server = app.server
 load_figure_template("darkly")
 
 app.layout = html.Div([
