@@ -32,7 +32,28 @@ export class FargateStack extends cdk.Stack {
       image: ecs.ContainerImage.fromEcrRepository(props.ecrRepo, "latest"),
     });
 
-    const service = new ecs.FargateService(this, 'StrongFargateService', { cluster, taskDefinition });
+    container.addPortMappings({
+      containerPort: 8050,
+      hostPort: 8050
+    });
+
+
+    const fargate_sg = new ec2.SecurityGroup(this, 'fargateSG', {
+      vpc: props.infraVpc,
+      allowAllOutbound: true
+    });
+
+    fargate_sg.addIngressRule(
+      ec2.Peer.anyIpv4(), 
+      ec2.Port.tcp(8050), 
+      'HTTP from anywhere');
+
+    const service = new ecs.FargateService(this, 'StrongFargateService', {
+      cluster, 
+      taskDefinition, 
+      assignPublicIp: true,
+      securityGroups: [fargate_sg]
+     });
 
   }
 }
